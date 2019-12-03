@@ -26,6 +26,9 @@ function! s:KillHandler(timer) abort
     call job_stop(l:job, 'kill')
 endfunction
 
+function! s:PrintErrorCallback(job, data, event) abort
+endfunction
+
 function! s:NeoVimCallback(job, data, event) abort
     let l:info = s:job_map[a:job]
 
@@ -227,6 +230,9 @@ function! ale#job#Start(command, options) abort
         if has_key(a:options, 'err_cb')
             let l:job_options.on_stderr = function('s:NeoVimCallback')
             let l:job_info.err_cb_line = ''
+        else
+            let l:job_options.on_stderr = function('s:PrintErrorCallback')
+            let l:job_info.err_cb_line = ''
         endif
 
         if has_key(a:options, 'exit_cb')
@@ -248,6 +254,8 @@ function! ale#job#Start(command, options) abort
 
         if has_key(a:options, 'err_cb')
             let l:job_options.err_cb = function('s:VimErrorCallback')
+        else
+            let l:job_options.err_cb = function('s:PrintErrorCallback')
         endif
 
         if has_key(a:options, 'exit_cb')
